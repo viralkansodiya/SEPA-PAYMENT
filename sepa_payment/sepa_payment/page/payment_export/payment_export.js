@@ -38,7 +38,7 @@ frappe.payment_export = {
 
                 // generate payment file
                 frappe.call({
-                    method: 'sepa_payment.sepa_payment.page.payment_export.payment_export.generate_payment_file',
+                    method: 'sepa_payment.sepa_payment.page.payment_export.payment_export.genrate_file_for_sepa',
                     args: {
                         'payments': payments,
                     },
