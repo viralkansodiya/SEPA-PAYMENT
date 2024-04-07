@@ -49,7 +49,8 @@ def make_line(line):
     return line + "\r\n"
 
 
-def genrate_file_for_sepa(payments):
+@frappe.whitelist()
+def genrate_file_for_sepa(payments, posting_date):
     payments = eval(payments)
     payments = list(filter(None, payments))
 
@@ -57,7 +58,9 @@ def genrate_file_for_sepa(payments):
 
     group_header = get_group_header_content(payments, message_root)
 
-    payment_information_element = get_payment_info(payments, group_header)
+    payment_information_element = get_payment_info(payments, group_header, posting_date)
+
+    return payment_information_element
 
 
 def get_message_root():
@@ -73,7 +76,7 @@ def get_message_root():
 
 
 def get_group_header_content(payments, message_root):
-    content = message_root
+    content = "\r\n" + message_root
     content += make_line("      <GrpHdr>")
     content += make_line(
         "          <MsgId>{0}</MsgId>".format(time.strftime("%Y%m%d%H%M%S"))
@@ -111,8 +114,8 @@ def get_group_header_content(payments, message_root):
     return content
 
 
-def get_payment_info(payments, group_header):
-    content = group_header
+def get_payment_info(payments, group_header, posting_date):
+    content = "\r\n" + group_header
     content += make_line("      <PmtInf>")
     content += make_line("          <PmtInfId>{0}</PmtInfId>".format(payments[0]))
     content += make_line("          <PmtMtd>TRF</PmtMtd>")
@@ -140,9 +143,7 @@ def get_payment_info(payments, group_header):
     )
 
     content += make_line("          <Dbtr>")
-    company_name = frappe.db.get_value(
-        "Payment Export Settings", payment_export_settings, "company_name"
-    )
+    company_name = get_company_name(payments[0])
     content += make_line("              <Nm>{0}</Nm>".format(company_name))
     content += make_line("              <Id>")
     content += make_line("                  <OrgId>")
@@ -159,9 +160,7 @@ def get_payment_info(payments, group_header):
 
     content += make_line("          <DbtrAcct>")
     content += make_line("              <Id>")
-    iban = frappe.db.get_value(
-        "Payment Export Settings", payment_export_settings, "iban_for_sepa_payment"
-    )
+    iban = get_company_iban(company_name)
     content += make_line("                  <IBAN>{0}</IBAN>".format(iban))
     content += make_line("              </Id>")
     content += make_line("              <Ccy>EUR</Ccy>")
@@ -260,3 +259,16 @@ def get_supplier_iban_no(party):
     if iban:
         return iban[0].iban
     return ""
+
+
+def get_company_name(payment_entry):
+    return frappe.get_value("Payment Entry", payment_entry, "company")
+
+
+def get_company_iban(company_name):
+    iban = frappe.db.sql(
+        f"""
+        Select iban From `tabBank Account` where is_company_account = 1 and company = '{company_name}'
+     """,
+        as_dict=1,
+    )

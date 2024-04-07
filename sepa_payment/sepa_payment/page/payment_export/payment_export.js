@@ -41,6 +41,7 @@ frappe.payment_export = {
                     method: 'sepa_payment.sepa_payment.page.payment_export.payment_export.genrate_file_for_sepa',
                     args: {
                         'payments': payments,
+                        "posting_date": page.posting_date_field.get_value(),
                     },
                     callback: function(r) {
                         if (r.message) {
@@ -82,7 +83,7 @@ frappe.payment_export = {
         frappe.call({
             method: 'sepa_payment.sepa_payment.page.payment_export.payment_export.get_payments',
             args: {
-
+                "posting_date": page.posting_date_field.get_value(),
              },
             callback: function(r) {
                 if (r.message) {
