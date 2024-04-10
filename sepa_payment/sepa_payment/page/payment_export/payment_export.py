@@ -17,20 +17,19 @@ from itertools import groupby
 def get_payments():
     payments = frappe.db.sql(
         """ Select pe.name, pe.posting_date, pe.paid_amount, pe.party, pe.party_name, ba.iban,
-            pe.paid_from, pe.paid_to_account_currency, per.reference_doctype, per.reference_name
-            From `tabPayment Entry` as pe
-            Left Join `tabPayment Entry Reference` as per ON per.parent = pe.name
-            left join `tabBank Account` as ba ON ba.party_type = pe.party_type and ba.party = pe.party
-            Where pe.docstatus = 0 and pe.payment_type = "Pay" and pe.party_type = "Supplier" and pe.xml_file_generated = 0 and ba.iban is not null
-            order by posting_date
-        """,
+			pe.paid_from, pe.paid_to_account_currency, per.reference_doctype, per.reference_name
+			From `tabPayment Entry` as pe
+			Left Join `tabPayment Entry Reference` as per ON per.parent = pe.name
+			left join `tabBank Account` as ba ON ba.party_type = pe.party_type and ba.party = pe.party
+			Where pe.docstatus = 0 and pe.payment_type = "Pay" and pe.xml_file_generated = 0 and ba.iban is not null and pe.paid_from_account_currency = 'EUR'
+			order by posting_date
+		""",
         as_dict=1,
     )
 
     payments_ = []
 
-    def key_func(k):
-        return k["name"]
+    key_func = lambda k: k["name"]
 
     INFO = sorted(payments, key=key_func)
 
@@ -252,8 +251,8 @@ def get_payment_info(payments, group_header, posting_date):
 def get_supplier_iban_no(party):
     iban = frappe.db.sql(
         f"""
-        Select iban From `tabBank Account` where party_type = 'Supplier' and party = '{party}' and iban is not null
-    """,
+		Select iban From `tabBank Account` where party_type = 'Supplier' and party = '{party}' and iban is not null
+	""",
         as_dict=1,
     )
     if iban:
@@ -268,7 +267,8 @@ def get_company_name(payment_entry):
 def get_company_iban(company_name):
     iban = frappe.db.sql(
         f"""
-        Select iban From `tabBank Account` where is_company_account = 1 and company = '{company_name}'
-     """,
+		Select iban From `tabBank Account` where is_company_account = 1 and company = '{company_name}'
+	 """,
         as_dict=1,
     )
+    return ""
