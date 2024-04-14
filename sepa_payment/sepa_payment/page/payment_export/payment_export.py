@@ -3,27 +3,30 @@
 # License: AGPL v3. See LICENCE
 
 from __future__ import unicode_literals
-import frappe
-from frappe import throw, _
-from collections import defaultdict
-import time
+
 import html
-from frappe.utils import flt, get_link_to_form, getdate, nowdate, now
+import time
+from collections import defaultdict
 from datetime import datetime
 from itertools import groupby
 
+import frappe
+from frappe import _, throw
+from frappe.utils import flt, get_link_to_form, getdate, now, nowdate
+
 
 @frappe.whitelist()
-def get_payments():
+def get_payments(company):
     payments = frappe.db.sql(
-        """ Select pe.name, pe.posting_date, pe.paid_amount, pe.party, pe.party_name, ba.iban,
-			pe.paid_from, pe.paid_to_account_currency, per.reference_doctype, per.reference_name
-			From `tabPayment Entry` as pe
-			Left Join `tabPayment Entry Reference` as per ON per.parent = pe.name
-			left join `tabBank Account` as ba ON ba.party_type = pe.party_type and ba.party = pe.party
-			Where pe.docstatus = 0 and pe.payment_type = "Pay" and pe.xml_file_generated = 0 and ba.iban is not null and pe.paid_from_account_currency = 'EUR'
-			order by posting_date
-		""",
+        f""" Select pe.name, pe.posting_date, pe.paid_amount, pe.party, pe.party_name, ba.iban,
+            pe.paid_from, pe.paid_to_account_currency, per.reference_doctype, per.reference_name
+            From `tabPayment Entry` as pe
+            Left Join `tabPayment Entry Reference` as per ON per.parent = pe.name
+            left join `tabBank Account` as ba ON ba.party_type = pe.party_type and ba.party = pe.party
+            Where pe.docstatus = 0 and pe.payment_type = "Pay" and pe.xml_file_generated = 0 and ba.iban is not null
+            and pe.paid_from_account_currency = 'EUR' and pe.company = '{company}'
+            order by posting_date
+        """,
         as_dict=1,
     )
 
@@ -39,8 +42,11 @@ def get_payments():
             ref_name_list.append(d.get("reference_name"))
         d.update({"reference_name": ref_name_list})
         payments_.append(d)
+    total_paid_amount = 0
+    for row in payments_:
+        total_paid_amount += row.paid_amount
 
-    return {"payments": payments_}
+    return {"payments": payments_, "total_paid_amount": total_paid_amount}
 
 
 # adds Windows-compatible line endings (to make the xml look nice)
@@ -251,8 +257,8 @@ def get_payment_info(payments, group_header, posting_date):
 def get_supplier_iban_no(party):
     iban = frappe.db.sql(
         f"""
-		Select iban From `tabBank Account` where party_type = 'Supplier' and party = '{party}' and iban is not null
-	""",
+        Select iban From `tabBank Account` where party_type = 'Supplier' and party = '{party}' and iban is not null
+    """,
         as_dict=1,
     )
     if iban:
@@ -267,8 +273,8 @@ def get_company_name(payment_entry):
 def get_company_iban(company_name):
     iban = frappe.db.sql(
         f"""
-		Select iban From `tabBank Account` where is_company_account = 1 and company = '{company_name}'
-	 """,
+        Select iban From `tabBank Account` where is_company_account = 1 and company = '{company_name}'
+     """,
         as_dict=1,
     )
     return ""

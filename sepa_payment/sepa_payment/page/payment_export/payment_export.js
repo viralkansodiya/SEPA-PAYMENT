@@ -6,13 +6,21 @@ frappe.pages['payment-export'].on_page_load = function(wrapper) {
     });
     frappe.payment_export.make(page);
 
+    page.company_field = page.add_field({
+        fieldname: 'company',
+        label: __('Company'),
+        fieldtype:'Link',
+        options:'Company',
+        default: frappe.defaults.get_user_default("Company"),
+    });
+
     page.posting_date_field = page.add_field({
         fieldname: 'posting_date',
         label: __('Required Execution Date'),
         fieldtype:'Date',
         default:"Today"
     });
-    frappe.payment_export.run(page);
+
     getfindSelected()
 }
 frappe.payment_export = {
@@ -42,6 +50,7 @@ frappe.payment_export = {
                     args: {
                         'payments': payments,
                         "posting_date": page.posting_date_field.get_value(),
+                        'company': page.company_field.get_value()
                     },
                     callback: function(r) {
                         if (r.message) {
@@ -75,6 +84,7 @@ frappe.payment_export = {
             method: 'sepa_payment.sepa_payment.page.payment_export.payment_export.get_payments',
             args: {
                 "posting_date": page.posting_date_field.get_value(),
+                "company":page.company_field.get_value()
              },
             callback: function(r) {
                 if (r.message) {
