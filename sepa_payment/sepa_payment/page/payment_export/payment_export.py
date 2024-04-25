@@ -63,9 +63,15 @@ def genrate_file_for_sepa(payments, posting_date):
 
     group_header = get_group_header_content(payments, message_root)
 
-    payment_information_element = get_payment_info(payments, group_header, posting_date)
+    content, transaction_count, control_sum = get_payment_info(
+        payments, group_header, posting_date
+    )
 
-    return payment_information_element
+    gen_payment_export_log(
+        content, transaction_count, control_sum, payments, currency=None
+    )
+
+    return content
 
 
 def get_message_root():
@@ -251,7 +257,7 @@ def get_payment_info(payments, group_header, posting_date):
     )
     content = content.replace(control_sum_identifier, "{:.2f}".format(control_sum))
 
-    return content
+    return content, transaction_count, control_sum
 
 
 def get_supplier_iban_no(party):
@@ -299,3 +305,29 @@ def get_company_iban(company_name):
             )
         return iban[0].iban
     return ""
+
+
+def gen_payment_export_log(
+    content, total_no_of_payments, total_paid_amount, payments, currency=None
+):
+    doc = frappe.new_doc("Payment Export Log")
+    doc.file_creation_time = now()
+    doc.user = frappe.session.user
+    doc.currency = currency
+    doc.total_paid_amount = total_paid_amount
+    doc.total_no_of_payments = total_no_of_payments
+    doc.content = content
+    doc.flags.ignore_permissions = 1
+    for row in payments:
+        pay_doc = frappe.get_doc("Payment Entry", row)
+        doc.append(
+            "logs",
+            {
+                "payment_entry": row,
+                "supplier": pay_doc.party,
+                "paid_amount": pay_doc.paid_amount,
+                "status": pay_doc.status,
+            },
+        )
+
+    doc.save()
