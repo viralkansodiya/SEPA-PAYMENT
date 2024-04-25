@@ -81,7 +81,7 @@ def get_message_root():
 
 
 def get_group_header_content(payments, message_root):
-    content = "\r\n" + message_root
+    content = message_root
     content += make_line("      <GrpHdr>")
     content += make_line(
         "          <MsgId>{0}</MsgId>".format(time.strftime("%Y%m%d%H%M%S"))
@@ -120,7 +120,7 @@ def get_group_header_content(payments, message_root):
 
 
 def get_payment_info(payments, group_header, posting_date):
-    content = "\r\n" + group_header
+    content = group_header
     content += make_line("      <PmtInf>")
     content += make_line("          <PmtInfId>{0}</PmtInfId>".format(payments[0]))
     content += make_line("          <PmtMtd>TRF</PmtMtd>")
@@ -257,11 +257,19 @@ def get_payment_info(payments, group_header, posting_date):
 def get_supplier_iban_no(party):
     iban = frappe.db.sql(
         f"""
-        Select iban From `tabBank Account` where party_type = 'Supplier' and party = '{party}' and iban is not null
+        Select iban, name From `tabBank Account` where party_type = 'Supplier' and party = '{party}' and iban is not null
     """,
         as_dict=1,
     )
+    if not iban:
+        frappe.throw("Please create bank account for supplier <b>{0}</b>".format(party))
     if iban:
+        if not iban[0].get("iban"):
+            frappe.throw(
+                "Please update a iban number in bank account <b>{0}</b>".format(
+                    get_link_to_form("Bank Account", iban[0].get("name"))
+                )
+            )
         return iban[0].iban
     return ""
 
@@ -273,8 +281,21 @@ def get_company_name(payment_entry):
 def get_company_iban(company_name):
     iban = frappe.db.sql(
         f"""
-        Select iban From `tabBank Account` where is_company_account = 1 and company = '{company_name}'
+        Select iban, name From `tabBank Account` where is_company_account = 1 and company = '{company_name}'
      """,
         as_dict=1,
     )
+
+    if not iban:
+        frappe.throw(
+            "Please create bank account for company <b>{0}</b>".format(company_name)
+        )
+    if iban:
+        if not iban[0].get("iban"):
+            frappe.throw(
+                "Please update a iban number in bank account <b>{0}</b>".format(
+                    get_link_to_form("Bank Account", iban[0].get("name"))
+                )
+            )
+        return iban[0].iban
     return ""

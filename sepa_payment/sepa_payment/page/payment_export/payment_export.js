@@ -60,7 +60,7 @@ frappe.payment_export = {
                             var parent = page.main.find(".insert-log-messages").empty();
 
                             // prepare the xml file for download
-                            download(`payments${r.message.time}.xml`, r.message.content);
+                            download(`payments${r.message.time}.xml`, r.message);
                             // remove create file button to prevent double payments
                             page.main.find(".btn-create-file").addClass("hide");
                         }
