@@ -109,6 +109,17 @@ def get_group_header_content(payments, message_root):
     content += make_line(
         "              <Nm>{0}</Nm>".format(get_company_name(payments[0]))
     )
+
+    company = get_company_name(payments[0])
+    initiating_party_org_id = frappe.db.get_value(
+        "Company", company, "initiating_party_org_id"
+    )
+    if not initiating_party_org_id:
+        frappe.throw(
+            "Please update a valid <b>Initiating Party Org Id</b> in company {}".format(
+                get_link_to_form("Company", company)
+            )
+        )
     content += make_line("              <Id>")
     content += make_line("                  <OrgId>")
     content += make_line("                      <Othr>")
@@ -155,11 +166,18 @@ def get_payment_info(payments, group_header, posting_date):
 
     content += make_line("          <Dbtr>")
     company_name = get_company_name(payments[0])
+    debtor_org_id = frappe.db.get_value("Company", company_name, "debtor_org_id")
+    if not debtor_org_id:
+        frappe.throw(
+            "Please update a valid <b>Debtor Org Id</b> in company {}".format(
+                get_link_to_form("Company", company_name)
+            )
+        )
     content += make_line("              <Nm>{0}</Nm>".format(company_name))
     content += make_line("              <Id>")
     content += make_line("                  <OrgId>")
     content += make_line("                      <Othr>")
-    content += make_line("                          <Id>55667755110004</Id>")
+    content += make_line("                          <Id>{}</Id>".format(debtor_org_id))
     content += make_line("                          <SchmeNm>")
     content += make_line("                              <Cd>BANK</Cd>")
     content += make_line("                          </SchmeNm>")
