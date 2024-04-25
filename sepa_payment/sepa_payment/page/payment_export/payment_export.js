@@ -21,7 +21,7 @@ frappe.pages['payment-export'].on_page_load = function(wrapper) {
         default:"Today"
     });
     page.set_secondary_action('Refresh', () => refresh())
-
+    frappe.payment_export.run(page);
     getfindSelected()
 }
 frappe.payment_export = {
