@@ -190,7 +190,7 @@ def get_payment_info(payments, group_header, posting_date):
     content += make_line("          <DbtrAcct>")
     content += make_line("              <Id>")
     iban = get_company_iban(company_name)
-    content += make_line("                  <IBAN>{0}</IBAN>".format(iban))
+    content += make_line("                  <IBAN>{0}</IBAN>".format(iban.get("iban")))
     content += make_line("              </Id>")
     content += make_line("              <Ccy>EUR</Ccy>")
     content += make_line("          </DbtrAcct>")
@@ -200,9 +200,18 @@ def get_payment_info(payments, group_header, posting_date):
         "          <!-- Note: For IBAN only on Debtor side use Othr/Id: NOTPROVIDED - see below -->"
     )
     content += make_line("              <FinInstnId>")
-    content += make_line("                  <Othr>")
-    content += make_line("                      <Id>NOTPROVIDED</Id>")
-    content += make_line("                  </Othr>")
+    if iban.get("branch_code") or iban.get("swift_number"):
+        content += make_line(
+            "          <BIC>{0}</BIC>".format(
+                iban.get("swift_number")
+                if iban.get("swift_number")
+                else iban.get("branch_code")
+            )
+        )
+    else:
+        content += make_line("                  <Othr>")
+        content += make_line("                      <Id>NOTPROVIDED</Id>")
+        content += make_line("                  </Othr>")
     content += make_line("              </FinInstnId>")
     content += make_line("          </DbtrAgt>")
 
@@ -305,7 +314,10 @@ def get_company_name(payment_entry):
 def get_company_iban(company_name):
     iban = frappe.db.sql(
         f"""
-        Select iban, name From `tabBank Account` where is_company_account = 1 and company = '{company_name}'
+        Select ba.iban, ba.name, b.bank, b.swift_number, ba.branch_code
+        From `tabBank Account` as ba
+        Left Join `tabBank` as b On b.name = ba.bank
+        where is_company_account = 1 and company = '{company_name}'
      """,
         as_dict=1,
     )
@@ -321,7 +333,7 @@ def get_company_iban(company_name):
                     get_link_to_form("Bank Account", iban[0].get("name"))
                 )
             )
-        return iban[0].iban
+        return iban[0]
     return ""
 
 
