@@ -314,7 +314,7 @@ def get_company_name(payment_entry):
 def get_company_iban(company_name):
     iban = frappe.db.sql(
         f"""
-        Select ba.iban, ba.name, b.bank, b.swift_number, ba.branch_code
+        Select ba.iban, ba.name, ba.bank, b.swift_number, ba.branch_code
         From `tabBank Account` as ba
         Left Join `tabBank` as b On b.name = ba.bank
         where is_company_account = 1 and company = '{company_name}'
