@@ -18,7 +18,7 @@ from frappe.utils import flt, get_link_to_form, getdate, now, nowdate, get_url
 @frappe.whitelist()
 def get_payments(company):
     payments = frappe.db.sql(
-        f""" Select pe.name, pe.posting_date, pe.paid_amount, pe.party, pe.party_name, ba.iban,
+        f""" Select pe.name, pe.posting_date, pe.paid_amount, pe.party, pe.party_name, ba.iban,pe.total_allocated_amount,
             pe.paid_from, pe.paid_to_account_currency, per.reference_doctype, per.reference_name
             From `tabPayment Entry` as pe
             Left Join `tabPayment Entry Reference` as per ON per.parent = pe.name
@@ -269,7 +269,8 @@ def get_payment_info(payments, group_header, posting_date):
                 "bill_no",
             )
             sup_invoice_no.append(bill_no)
-        sup_invoice_no = " ,".join(sup_invoice_no)
+        if sup_invoice_no:
+            sup_invoice_no = " ,".join(sup_invoice_no)
 
         content += make_line(
             "                  <Ustrd>{0}</Ustrd>".format(
