@@ -12,7 +12,7 @@ from itertools import groupby
 
 import frappe
 from frappe import _, throw
-from frappe.utils import flt, get_link_to_form, getdate, now, nowdate
+from frappe.utils import flt, get_link_to_form, getdate, now, nowdate, get_url
 
 
 @frappe.whitelist()
@@ -361,3 +361,43 @@ def gen_payment_export_log(
         )
 
     doc.save()
+
+
+@frappe.whitelist()
+def validate_master_data(company):
+    payment = frappe.db.sql(
+        f""" Select pe.name, pe.posting_date, pe.paid_amount, pe.party, pe.party_name, ba.iban, ba.name as bank_account,pe.party_type,
+                                pe.paid_from, pe.paid_to_account_currency, per.reference_doctype, per.reference_name
+                                From `tabPayment Entry` as pe
+                                Left Join `tabPayment Entry Reference` as per ON per.parent = pe.name
+                                left join `tabBank Account` as ba ON ba.party_type = pe.party_type and ba.party = pe.party
+                                Where pe.docstatus = 0 and pe.payment_type = "Pay" and pe.xml_file_generated = 0
+                                and pe.paid_from_account_currency = 'EUR' and pe.company = '{company}'
+                                order by posting_date
+                            """,
+        as_dict=1,
+    )
+    master_data = []
+
+    for row in payment:
+        if row.bank_account and not row.iban:
+            url = ""
+            url = get_url()
+            url += url + f"/apps/bank-account/{row.bank_account}"
+            master_data.append(
+                {
+                    "doctype": row.party_type,
+                    "party": row.party,
+                    "msg": f"Iban Code is missing in <a href ='{url}'>bank account</a> ",
+                }
+            )
+        if not row.bank_account:
+            master_data.append(
+                {
+                    "doctype": row.party_type,
+                    "party": row.party,
+                    "msg": "<b>Bank Account</b> details is missing",
+                }
+            )
+
+    return master_data

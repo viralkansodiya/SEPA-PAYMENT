@@ -35,8 +35,6 @@ frappe.payment_export = {
 
         // attach button handlers
         this.page.main.find(".btn-create-file").on('click', function() {
-            var me = frappe.payment_export;
-
             // find selected payments
             var checkedPayments = findSelected();
             if (checkedPayments.length > 0) {
@@ -55,10 +53,8 @@ frappe.payment_export = {
                     },
                     callback: function(r) {
                         if (r.message) {
-                            console.log(r.message)
                             // log errors if present
                             var parent = page.main.find(".insert-log-messages").empty();
-
                             // prepare the xml file for download
                             download(`payments${r.message.time}.xml`, r.message);
                             // remove create file button to prevent double payments
@@ -71,6 +67,26 @@ frappe.payment_export = {
                 frappe.msgprint( __("Please select at least one payment."), __("Information") );
             }
         });
+        this.page.main.find(".btn-validate").on('click', function() {
+            frappe.call({
+                method: "sepa_payment.sepa_payment.page.payment_export.payment_export.validate_master_data",
+                args: {
+                    'company': page.company_field.get_value()
+                },
+                callback:function(r){
+                    console.log(r.message)
+                    let html = `<table class="table" width="100%">
+                                    <tbody>`
+                    r.message.forEach(element =>{
+                        html += `<tr><td>${element.party}</td><td>${element.msg}</td></tr>`
+                    })
+                    html += `</tbody>
+                        </table>`
+                    var logs = page.main.find(".missing_data").empty();
+                    $(html).appendTo(logs);
+                }
+            })
+        })
     },
     run: function(page) {
         // populate payment entries
