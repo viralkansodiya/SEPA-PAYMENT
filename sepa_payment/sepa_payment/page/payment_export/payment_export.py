@@ -234,7 +234,8 @@ def get_payment_info(payments, group_header, posting_date):
         content += make_line("              <Amt>")
         content += make_line(
             '                  <InstdAmt Ccy="{0}">{1:.2f}</InstdAmt>'.format(
-                payment_record.paid_from_account_currency, payment_record.paid_amount
+                payment_record.paid_from_account_currency,
+                payment_record.total_allocated_amount,
             )
         )
         content += make_line("              </Amt>")
