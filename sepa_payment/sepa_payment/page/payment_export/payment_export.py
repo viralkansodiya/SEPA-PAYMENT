@@ -268,7 +268,8 @@ def get_payment_info(payments, group_header, posting_date):
                 payment_record.references[0].reference_name,
                 "bill_no",
             )
-            sup_invoice_no.append(bill_no)
+            if bill_no:
+                sup_invoice_no.append(bill_no)
         if sup_invoice_no:
             sup_invoice_no = " ,".join(sup_invoice_no)
 
