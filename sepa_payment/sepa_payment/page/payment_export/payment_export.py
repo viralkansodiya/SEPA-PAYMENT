@@ -123,7 +123,9 @@ def get_group_header_content(payments, message_root):
     content += make_line("              <Id>")
     content += make_line("                  <OrgId>")
     content += make_line("                      <Othr>")
-    content += make_line("                          <Id>556036867100</Id>")
+    content += make_line(
+        f"                          <Id>{initiating_party_org_id}</Id>"
+    )
     content += make_line("                          <SchmeNm>")
     content += make_line("                              <Cd>BANK</Cd>")
     content += make_line("                          </SchmeNm>")
@@ -240,9 +242,7 @@ def get_payment_info(payments, group_header, posting_date):
             "              <!-- Note: Creditor Agent should not be used at all for IBAN only on Creditor side -->"
         )
         content += make_line("              <Cdtr>")
-        # if payment_record.party_type == "Employee":
-        #     name = frappe.get_value("Employee", payment_record.party, "employee_name")
-        # if payment_record.party_type == "Supplier":
+
         name = frappe.db.get_value("Supplier", payment_record.party, "supplier_name")
         if "&" in name:
             new_name = name.replace("& ", "")
@@ -260,13 +260,16 @@ def get_payment_info(payments, group_header, posting_date):
         content += make_line("                  </Id>")
         content += make_line("              </CdtrAcct>")
         content += make_line("              <RmtInf>")
-        sup_invoice_no = ""
-        if payment_record.references[0].reference_doctype == "Purchase Invoice":
-            sup_invoice_no = frappe.db.get_value(
+        sup_invoice_no = []
+        for row in payment_record.references:
+            bill_no = frappe.db.get_value(
                 "Purchase Invoice",
                 payment_record.references[0].reference_name,
                 "bill_no",
             )
+            sup_invoice_no.append(bill_no)
+        sup_invoice_no = " ,".join(sup_invoice_no)
+
         content += make_line(
             "                  <Ustrd>{0}</Ustrd>".format(
                 sup_invoice_no if sup_invoice_no else ""
