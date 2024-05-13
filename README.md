@@ -28,23 +28,32 @@ With This version of the app, you can generate XML file for creditors.
 
 <hr>
 
+### Supplier with EUR Currency
+
 ![Supplier](https://github.com/viralkansodiya/SEPA-PAYMENT/assets/141210323/4ef7ef37-e28b-47b0-ba5b-6a26810b6c8f)
 
 <hr>
+
+### Supplier Bank Account
 
 ![Bank a](https://github.com/viralkansodiya/SEPA-PAYMENT/assets/141210323/51fc58d0-4c78-40e0-a39a-9652d5ee52f0)
 
 <hr>
 
+### Company Bank Account
+
 ![company bank](https://github.com/viralkansodiya/SEPA-PAYMENT/assets/141210323/1a49af1c-1dc4-491d-8a7c-a0dcca6236ff)
 
 <hr>
+
+### Purchase Invoice
 
 ![PI](https://github.com/viralkansodiya/SEPA-PAYMENT/assets/141210323/eb05d7a7-8fac-4efd-b3d4-dce260149788)
 
 <hr>
 
-![EUR Su](https://github.com/viralkansodiya/SEPA-PAYMENT/assets/141210323/17b5d1ec-7f73-411b-97dc-82ba0231fbef)
+### Payment Entry In Draft
 
+![EUR Su](https://github.com/viralkansodiya/SEPA-PAYMENT/assets/141210323/17b5d1ec-7f73-411b-97dc-82ba0231fbef)
 
 
