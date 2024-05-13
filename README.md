@@ -6,7 +6,7 @@ Welcome to our SEPA payments generation feature! With this tool, you can easily 
 
 With This version of the app, you can generate XML file for creditors.
 ### Pre Setup
-  1. Create EUR Bank Account (Chart of Account)
+  1. Create EUR Bank Account (Chart of Accounts)
   2. Company EUR Bank Account (Bank Account)
   3. Company Address
   4. Initiating Party Org Id (This id is assigned by Bank)
