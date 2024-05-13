@@ -367,6 +367,7 @@ def gen_payment_export_log(
         )
 
     doc.save()
+    frappe.msgprint("Payment Export Log :- {}".format(get_link_to_form("Payment Export Log", doc.name)))
 
 
 @frappe.whitelist()

@@ -74,7 +74,9 @@ frappe.payment_export = {
                     'company': page.company_field.get_value()
                 },
                 callback:function(r){
-                    console.log(r.message)
+                    if(!r.message){
+                        frappe.msgprint("No missing master data found.")
+                    }
                     let html = `<table class="table" width="100%">
                                     <tbody>`
                     r.message.forEach(element =>{
