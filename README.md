@@ -9,8 +9,8 @@ With This version of the app, you can generate XML file for creditors.
   1. Create EUR bank Account (Chart of Account)
   2. Company EUR Bank Account (Bank Account)
   3. Company Address
-  4. Initiating Party Org Id
-  5. Debtor Org Id
+  4. Initiating Party Org Id (This id is assigned by Bank)
+  5. Debtor Org Id (Tax number - VAT number or Corporate Id)
 
 ### Supplier Details
   1. Create a supplier bank account in EUR currency (Iban Code, Branch Code or Swift Code)
