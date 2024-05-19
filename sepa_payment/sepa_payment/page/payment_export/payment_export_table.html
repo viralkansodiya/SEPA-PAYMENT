@@ -1,26 +1,40 @@
+<style>
+	.ontop{
+		border-top: 1px solid black !important;
+	}
+	.onbottom{
+		border-bottom: 1px solid black !important;
+	}
+	.onright{
+		border-right: 1px solid black;
+	}
+	.onleft{
+		border-left: 1px solid black;
+	}
+</style>
 <table  class="table">
 	<tr>
-		<th><input type="checkbox" class="selectall" onclick="selectunselect()"></th>
-		<th>{{ __("Payment") }}</th>
-		<th>{{ __("Posting date") }}</th>
-		<th>{{ __("Amount") }}</th>
-		<th>{{ __("Party Name") }}</th>
-		<th>{{ __("Purchase Invoice") }}</th>
-		<th>{{ __("Account") }}</th>
+		<th class="ontop" ><input type="checkbox" class="selectall" onclick="selectunselect()"></th>
+		<th class="ontop" >{{ __("Payment") }}</th>
+		<th class="ontop" >{{ __("Posting date") }}</th>
+		<th class="ontop" >{{ __("Amount") }}</th>
+		<th class="ontop" >{{ __("Party Name") }}</th>
+		<th class="ontop" >{{ __("Purchase Invoice") }}</th>
+		<th class="ontop" >{{ __("Account") }}</th>
 	</tr>
 	{% for payment in payments %}
 	<tr>
-		<td><input class="inputcheck" type="checkbox" id="chk{{ payment.name }}" name="{{ payment.name }}" onclick=getfindSelected()></td>
-		<td><a href="/desk/Form/Payment Entry/{{ payment.name }}">{{ payment.name }}</a></td>
-		<td>{{ payment.posting_date }}</td>
-		<td>{{ payment.paid_to_account_currency }}&nbsp;{{ payment.total_allocated_amount }}</td>
-		<td><a href="/desk/Form/Supplier/{{ payment.party }}">{{ payment.party_name }}</a></td>
+		<td class="ontop onbottom"><input class="inputcheck" type="checkbox" id="chk{{ payment.name }}" name="{{ payment.name }}" onclick=getfindSelected()></td>
+		<td class="ontop onbottom"><a href="/desk/Form/Payment Entry/{{ payment.name }}">{{ payment.name }}</a></td>
+		<td class="ontop onbottom">{{ payment.posting_date }}</td>
+		<td class="ontop onbottom">{{ payment.paid_to_account_currency }}&nbsp;{{ payment.total_allocated_amount }}</td>
+		<td class="ontop onbottom"><a href="/desk/Form/Supplier/{{ payment.party }}">{{ payment.party_name }}</a></td>
 		{% if payment.reference_name|length > 1 %}
-		<td>{% for row in payment.reference_name %}<p><a href="/desk/Form/Purchase Invoice/{{ row }}">{{ row }}</a></p>, {% endfor%}</td>
+		<td class="ontop onbottom">{% for row in payment.reference_name %}<p><a href="/desk/Form/Purchase Invoice/{{ row }}">{{ row }}</a></p>, {% endfor%}</td>
 		{% else %}
-		<td>{% for row in payment.reference_name %}<p><a href="/desk/Form/Purchase Invoice/{{ row }}">{{ row }}</a></p> {% endfor%}</td>
+		<td class="ontop onbottom">{% for row in payment.reference_name %}<p><a href="/desk/Form/Purchase Invoice/{{ row }}">{{ row }}</a></p> {% endfor%}</td>
 		{% endif %}
-		<td>{{ payment.paid_from }}</td>
+		<td class="ontop onbottom">{{ payment.paid_from }}</td>
 	</tr>
 	{% endfor %}
 	<tr>

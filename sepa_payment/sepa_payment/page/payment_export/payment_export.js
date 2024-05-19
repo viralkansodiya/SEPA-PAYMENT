@@ -161,7 +161,7 @@ function getfindSelected() {
                 total_selected = r.paid_amount + total_selected
                 if(i == inputs.length){
                     var selected_entry = document.getElementById('total_selected_amount')
-                    selected_entry.innerHTML = `<b>Total Amount of Selected Entries</b>: ${total_selected}`
+                    selected_entry.innerHTML = `<b>Total Amount of Selected Entries</b>: <b>EUR ${total_selected}</b>`
                 }
             })
             a++;
