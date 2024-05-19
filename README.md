@@ -60,4 +60,3 @@ With This version of the app, you can generate XML file for creditors.
 <hr>
 
 https://github.com/viralkansodiya/SEPA-PAYMENT/assets/141210323/193d7b55-4bb5-42a8-96b8-fe008b7c0a60
-
